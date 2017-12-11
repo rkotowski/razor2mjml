@@ -1,0 +1,17 @@
+{
+  "name": "razor-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "minimist": "^1.2.0",
+    "mjml": "^3.3.5",
+    "vash": "^0.12.3"
+  }
+}
