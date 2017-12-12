@@ -1,3 +1,31 @@
 <mj-style>
-
+  @@media all and (max-width: 480px) {
+    .mob-hidden {
+      display: none !important;
+    }
+    .header td {
+      direction: rtl !important;
+    }
+    .header--icon__mob {
+      width: 20px !important;
+      padding: 0 15px;
+      float: right;
+    }
+    .header--group__phone,
+    .header--group__mobPhone {
+      width: calc(45% - 20px) !important;
+    }
+    .header--group__logo {
+      width: 60px !important;
+      padding: 5px;
+    }
+    .header--group__mobPhone td,
+    .header--group__mobPhone div {
+      display: none !important;
+    }
+  }
+  .bottom-shadow {
+    position: relative;
+    box-shadow: 0 5px 8px -7px #000;
+  }
 </mj-style>

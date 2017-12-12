@@ -1,6 +1,31 @@
 @model Grecos.Models.Mailing.Header
 
-<section>
-  <h3>@Model.Title</h3>
-  <img src="@Model.Image">
+<section class="header bottom-shadow" style="background-color: #fff; padding: 5px 0 7px;">
+  <div class="header--group__phone column">
+    <div class="mob-hidden" style="width: 20px;"></div>
+    <div class="header--icon__mob" style="width: 16px;">
+      <img src="" style="padding: 20px 0 0;" />
+    </div>
+    <div class="mob-hidden" style="width: 75%;">
+      <p class="mob-hidden" style="margin: 0; padding: 20px 0 0 10px; font-size: 16px; font-weight: bold; font-family: Arial; text-align: left; color: #787878;">
+        @Model.Phone
+      </p>
+    </div>
+  </div>
+  <div class="header--group__logo column">
+    <div style="text-align: center;">
+      <img src="@Model.Logo" alt="Grecos logo" style="padding: 0; width: 60px;" />
+    </div>
+  </div>
+  <div class="header--group__mobPhone column">
+    <div class="mob-hidden" style="width: 20px;"></div>
+    <div class="header--icon__mob" style="width: 16px;">
+      <img src="" style="padding: 20px 0 0;" />
+    </div>
+    <div>
+      <p class="mob-hidden" style="margin: 0; padding: 20px 0 0 10px; font-size: 16px; font-weight: bold; font-family: Arial; text-align: left; color: #787878;">
+        @Model.MobilePhone
+      </p>
+    </div>
+  </div>
 </section>

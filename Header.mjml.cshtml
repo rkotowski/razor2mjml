@@ -1,8 +1,51 @@
 @model Grecos.Models.Mailing.Header
 
-<mj-section>
-  <mj-column>
-    <mj-text>@Model.Title</mj-text>
-    <mj-image width="300" src="@Model.Image" />
-  </mj-column>
+<mj-section css-class="header bottom-shadow" background-color="#fff" padding="5px 0 7px">
+  <mj-group css-class="header--group__phone">
+    <mj-column width="20px" css-class="mob-hidden"></mj-column>
+    <mj-column width="16px" css-class="header--icon__mob">
+      <mj-image
+        src="./static/phone.svg"
+        padding="0"
+        padding-top="20px" />
+    </mj-column>
+    <mj-column width="75%" css-class="mob-hidden">
+      <mj-text
+        padding="20px 0 0 10px"
+        font-size="16px"
+        font-weight="bold"
+        font-family="Arial"
+        align="left"
+        mj-class="mob-hidden"
+        color="#787878">@Model.Phone</mj-text>
+    </mj-column>
+  </mj-group>
+
+  <mj-group css-class="header--group__logo">
+    <mj-column>
+      <mj-image
+        href="@Model.Logo"
+        alt="Grecos logo" align="center" padding="0" width="60">
+      </mj-image>
+    </mj-column>
+  </mj-group>
+  <mj-group css-class="header--group__mobPhone">
+    <mj-column width="20px" css-class="mob-hidden"></mj-column>
+    <mj-column width="16px" css-class="header--icon__mob">
+      <mj-image
+        src="./static/phone.svg"
+        padding="0"
+        padding-top="20px" />
+    </mj-column>
+    <mj-column width="75%" css-class="mob-hidden">
+      <mj-text
+        padding="20px 0 0 10px"
+        font-size="16px"
+        font-weight="bold"
+        font-family="Arial"
+        align="left"
+        mj-class="mob-hidden"
+        color="#787878">@Model.MobilePhone</mj-text>
+    </mj-column>
+  </mj-group>
 </mj-section>

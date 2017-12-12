@@ -1,0 +1,5 @@
+@if (Sitecore.Context.PageMode.IsExperienceEditor) {
+  @Html.Partial("Hero.html.cshtml")
+} else {
+  @Html.Partial("Hero.mjml.cshtml")
+}
