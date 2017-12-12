@@ -13,7 +13,7 @@ const express = require('express')
 const argv = require('minimist')(process.argv.slice(2))
 
 if (argv.h || argv.help) {
-  return console.log(`usage: ${path.basename(process.argv[1])} [ -i <filename> ] [--mode html|mjml|email] [--server]`)
+  return console.log(`usage: ${path.basename(process.argv[1])} [ -i <filename> ] [--mode html|mjml|email] [--server] [--port [number]`)
 }
 
 const input = argv.i || 'Layout.cshtml'
@@ -25,6 +25,7 @@ if (!fs.existsSync(input)) {
 const mode = argv.mode || 'email'
 const renderFinalEmail = mode === 'email'
 const server = argv.server
+const port = argv.port || 8080
 
 // -----------------------------------------------------------------------------
 // Definition of Model
@@ -156,7 +157,7 @@ function runServer() {
     return res.send(renderFinalEmail ? renderEmailMessageFromMjml(source) : source)
   })
 
-  app.listen(8080, () => console.log('Server running on port 8080...'))
+  app.listen(port, () => console.log(`Server running on port ${port}...`))
 }
 
 // -----------------------------------------------------------------------------
