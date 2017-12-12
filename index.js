@@ -12,14 +12,10 @@ const mjml = require('mjml')
 const argv = require('minimist')(process.argv.slice(2))
 
 if (argv.h || argv.help) {
-  return console.log(`usage: ${path.basename(process.argv[1])} -i <filename> [--mode html|mjml|email]`)
+  return console.log(`usage: ${path.basename(process.argv[1])} [ -i <filename> ] [--mode html|mjml|email]`)
 }
 
-if (!argv.i) {
-  return console.error(`[Converter] no input file specified (-i <filename>)`)
-}
-
-const input = argv.i
+const input = argv.i || 'Layout.cshtml'
 
 if (!fs.existsSync(input)) {
   return console.error(`[Converter] specified input file '${input}' does not exist`)
@@ -52,16 +48,47 @@ model.Model = model
 // -----------------------------------------------------------------------------
 
 const placeholders = {
-  Title: 'Hello, world!!!',
-  Image: 'http://www.online-image-editor.com//styles/2014/images/example_image.png',
+  head: [ {
+    template: 'Styles.cshtml'
+  } ],
+  content: [ {
+    template: 'Header.cshtml',
+    model: {
+      Title: 'Hello, world!!!',
+      Image: 'http://www.online-image-editor.com//styles/2014/images/example_image.png',
+    }
+  } ]
 }
 
 // -----------------------------------------------------------------------------
 // Matching Vash interface with Razor and Sitecore
 // -----------------------------------------------------------------------------
 
+function compile (template, model) {
+  let tpl = vash.compile(template)
+  return tpl(model)
+}
+
+function renderTemplate (filename, model) {
+  const template = fs.readFileSync(filename, 'utf8')
+  return compile(template, model)
+}
+
+function renderPlaceholderComponent (component) {
+  return renderTemplate(component.template, Object.assign(model, component.model))
+}
+
+function renderPlaceholder (name) {
+  if (placeholders[name] instanceof Array) {
+    return placeholders[name].map(renderPlaceholderComponent).join('\n')
+  } else {
+    return `[placeholder-${name}]`
+  }
+}
+
 vash.config.helpersName = 'Html'
 vash.config.modelName = 'Model'
+vash.config.htmlEscape = false
 
 // we are using this option to be able to add to the global namespace objects
 // like Sitecore and to provide a common interface with the real environment
@@ -71,7 +98,7 @@ vash.helpers.Include = vash.helpers.include
 vash.helpers.Partial = vash.helpers.include
 vash.helpers.RenderPartial = vash.helpers.include
 vash.helpers.Sitecore = () => ({
-  Placeholder: name => placeholders[name] || `[placeholder-${name}]`,
+  Placeholder: renderPlaceholder,
   DynamicPlaceholder: name => `[dynamic-placeholder-${name}]`,
 })
 
@@ -79,15 +106,7 @@ vash.helpers.Sitecore = () => ({
 // Main
 // -----------------------------------------------------------------------------
 
-function compile (template, model) {
-  if (renderFinalEmail) {
-    template = `<mjml><mj-body><mj-container>\n${template}</mj-container></mj-body></mjml>`
-  }
-  let tpl = vash.compile(template)
-  return tpl(model)
-}
-
-function render (source) {
+function renderEmailMessageFromMjml (source) {
   try {
     const output = mjml.mjml2html(source);
     if (output.errors.length > 0) {
@@ -102,9 +121,5 @@ function render (source) {
   }
 }
 
-fs.readFile(input, 'utf8', (err, template) => {
-  if (err) return console.error(err);
-
-  const source = compile(template, model)
-  console.log(renderFinalEmail ? render(source) : source)
-});
+const source = renderTemplate(input, model)
+console.log(renderFinalEmail ? renderEmailMessageFromMjml(source) : source)
