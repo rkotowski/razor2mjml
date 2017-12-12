@@ -4,6 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const vash = require('vash')
 const mjml = require('mjml')
+const express = require('express')
 
 // -----------------------------------------------------------------------------
 // Parsing command line arguments
@@ -12,7 +13,7 @@ const mjml = require('mjml')
 const argv = require('minimist')(process.argv.slice(2))
 
 if (argv.h || argv.help) {
-  return console.log(`usage: ${path.basename(process.argv[1])} [ -i <filename> ] [--mode html|mjml|email]`)
+  return console.log(`usage: ${path.basename(process.argv[1])} [ -i <filename> ] [--mode html|mjml|email] [--server]`)
 }
 
 const input = argv.i || 'Layout.cshtml'
@@ -23,6 +24,7 @@ if (!fs.existsSync(input)) {
 
 const mode = argv.mode || 'email'
 const renderFinalEmail = mode === 'email'
+const server = argv.server
 
 // -----------------------------------------------------------------------------
 // Definition of Model
@@ -90,6 +92,21 @@ function renderPlaceholder (name) {
   }
 }
 
+function renderEmailMessageFromMjml (source) {
+  try {
+    const output = mjml.mjml2html(source);
+    if (output.errors.length > 0) {
+      output.errors.forEach(error => console.error(error))
+      process.exit(1)
+    } else {
+      return output.html
+    }
+  } catch (e) {
+    console.error(e.message)
+    process.exit(1)
+  }
+}
+
 // -----------------------------------------------------------------------------
 // Matching Vash interface with Razor and Sitecore
 // -----------------------------------------------------------------------------
@@ -111,23 +128,43 @@ vash.helpers.Sitecore = () => ({
 })
 
 // -----------------------------------------------------------------------------
-// Main
+// Console
 // -----------------------------------------------------------------------------
 
-function renderEmailMessageFromMjml (source) {
-  try {
-    const output = mjml.mjml2html(source);
-    if (output.errors.length > 0) {
-      output.errors.forEach(error => console.error(error))
-      process.exit(1)
-    } else {
-      return output.html
-    }
-  } catch (e) {
-    console.error(e.message)
-    process.exit(1)
-  }
+function runConsole() {
+  const source = renderTemplate(input, model)
+  console.log(renderFinalEmail ? renderEmailMessageFromMjml(source) : source)
 }
 
-const source = renderTemplate(input, model)
-console.log(renderFinalEmail ? renderEmailMessageFromMjml(source) : source)
+// -----------------------------------------------------------------------------
+// Server
+// -----------------------------------------------------------------------------
+
+function runServer() {
+  const MEDIA_TYPES = {
+    email: 'text/html',
+    html: 'text/plain',
+    mjml: 'text/plain',
+  }
+
+  const app = express()
+  app.use(express.static('public'))
+
+  app.get('/', (req, res) => {
+    const source = renderTemplate(input, model)
+    res.type(MEDIA_TYPES[mode] || 'text/plain')
+    return res.send(renderFinalEmail ? renderEmailMessageFromMjml(source) : source)
+  })
+
+  app.listen(8080, () => console.log('Server running on port 8080...'))
+}
+
+// -----------------------------------------------------------------------------
+// Server
+// -----------------------------------------------------------------------------
+
+if (server) {
+  runServer()
+} else {
+  runConsole()
+}
