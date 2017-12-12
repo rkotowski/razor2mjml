@@ -61,7 +61,7 @@ const placeholders = {
 }
 
 // -----------------------------------------------------------------------------
-// Matching Vash interface with Razor and Sitecore
+// Processing engine
 // -----------------------------------------------------------------------------
 
 function compile (template, model) {
@@ -69,8 +69,12 @@ function compile (template, model) {
   return tpl(model)
 }
 
+function removeUnsupportedTags(template) {
+  return template.replace(/\@model .*?\n/g, '')
+}
+
 function renderTemplate (filename, model) {
-  const template = fs.readFileSync(filename, 'utf8')
+  const template = removeUnsupportedTags(fs.readFileSync(filename, 'utf8'))
   return compile(template, model)
 }
 
@@ -86,6 +90,10 @@ function renderPlaceholder (name) {
   }
 }
 
+// -----------------------------------------------------------------------------
+// Matching Vash interface with Razor and Sitecore
+// -----------------------------------------------------------------------------
+
 vash.config.helpersName = 'Html'
 vash.config.modelName = 'Model'
 vash.config.htmlEscape = false
@@ -95,8 +103,8 @@ vash.config.htmlEscape = false
 vash.config.useWith = true
 
 vash.helpers.Include = vash.helpers.include
-vash.helpers.Partial = vash.helpers.include
-vash.helpers.RenderPartial = vash.helpers.include
+vash.helpers.Partial = renderTemplate
+vash.helpers.RenderPartial = renderTemplate
 vash.helpers.Sitecore = () => ({
   Placeholder: renderPlaceholder,
   DynamicPlaceholder: name => `[dynamic-placeholder-${name}]`,

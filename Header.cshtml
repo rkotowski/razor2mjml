@@ -1,5 +1,7 @@
+@model Grecos.Models.Mailing.Header
+
 @if (Sitecore.Context.PageMode.IsExperienceEditor) {
-  @Html.Partial("Header.html.cshtml")
+  @Html.Partial("Header.html.cshtml", Model)
 } else {
-  @Html.Partial("Header.mjml.cshtml")
+  @Html.Partial("Header.mjml.cshtml", Model)
 }
